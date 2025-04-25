@@ -27,6 +27,7 @@ namespace ApiReceitas.Services
         public async Task AddIngredientAsync(Ingredient ingredient)
         {
             _dbContext.Ingredients.Add(ingredient);
+            await _dbContext.SaveChangesAsync();
             await Task.CompletedTask;
         }
 
@@ -37,6 +38,7 @@ namespace ApiReceitas.Services
             {
                 existingIngredient.Nome = ingredient.Nome;
                 existingIngredient.Unit = ingredient.Unit;
+                await _dbContext.SaveChangesAsync();
             }
             await Task.CompletedTask;
         }
@@ -46,7 +48,8 @@ namespace ApiReceitas.Services
             var ingredient = _dbContext.Ingredients.FirstOrDefault(i => i.IngredientId == id);
             if (ingredient != null)
             {
-                _dbContext.Remove(ingredient);
+                _dbContext.Ingredients.Remove(ingredient);
+                await _dbContext.SaveChangesAsync();
             }
             await Task.CompletedTask;
         }
