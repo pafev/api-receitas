@@ -14,6 +14,7 @@ namespace ApiReceitas.Services
 
         public async Task<IEnumerable<Recipe>> GetAllRecipesAsync()
         {
+            Console.WriteLine(_dbContext.RecipeIngredients.Count());
             var recipes = _dbContext.Recipes.ToList();
             return await Task.FromResult(recipes);
         }
@@ -26,8 +27,17 @@ namespace ApiReceitas.Services
 
         public async Task AddRecipeAsync(Recipe recipe)
         {
-            _dbContext.Add(recipe);
+            var recipeIngredients = recipe.RecipeIngredients;
+            recipe.RecipeIngredients = null;
+            _dbContext.Recipes.Add(recipe);
             await _dbContext.SaveChangesAsync();
+            if (recipeIngredients.Any()) {
+                foreach (RecipeIngredient recipeIngredient in recipeIngredients) {
+                    recipeIngredient.RecipeId = recipe.RecipeId;
+                }
+                _dbContext.Add(recipeIngredients);
+                await _dbContext.SaveChangesAsync();
+            }
             await Task.CompletedTask;
         }
 
@@ -37,9 +47,14 @@ namespace ApiReceitas.Services
             if (existingRecipe != null)
             {
                 existingRecipe.Method = recipe.Method;
-                existingRecipe.Ingredients = recipe.Ingredients;
-                existingRecipe.RecipeIngredients = recipe.RecipeIngredients;
                 await _dbContext.SaveChangesAsync();
+                if (recipe.RecipeIngredients.Any()) {
+                    foreach (RecipeIngredient recipeIngredient in recipe.RecipeIngredients) {
+                        recipeIngredient.RecipeId = existingRecipe.RecipeId;
+                    }
+                    _dbContext.AddRange(recipe.RecipeIngredients);
+                    await _dbContext.SaveChangesAsync();
+                }
             }
             await Task.CompletedTask;
         }

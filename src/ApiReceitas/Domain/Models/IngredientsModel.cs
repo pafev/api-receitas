@@ -3,19 +3,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ApiReceitas.Domain.Models
 {
-    [Table("ingredients")]
+    [Table("Ingredients")]
     public class Ingredient
     {
+        [Key]
         public Guid IngredientId { get; set; }
 
         [Required]
-        public string Nome { get; set; }
+        public string Name { get; set; }
 
         [Required]
         [MaxLength(15)]
         public string Unit { get; set; }
-
-        public List<Recipe> Recipes { get; set; } = [];
-        public List<RecipeIngredient> RecipeIngredients { get; set; } = [];
     }
 }

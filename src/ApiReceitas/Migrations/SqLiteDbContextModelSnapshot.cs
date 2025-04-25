@@ -23,7 +23,7 @@ namespace ApiReceitas.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Nome")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -34,7 +34,7 @@ namespace ApiReceitas.Migrations
 
                     b.HasKey("IngredientId");
 
-                    b.ToTable("ingredients");
+                    b.ToTable("Ingredients");
                 });
 
             modelBuilder.Entity("ApiReceitas.Domain.Models.Recipe", b =>
@@ -49,31 +49,33 @@ namespace ApiReceitas.Migrations
 
                     b.HasKey("RecipeId");
 
-                    b.ToTable("recipes");
+                    b.ToTable("Recipes");
                 });
 
             modelBuilder.Entity("ApiReceitas.Domain.Models.RecipeIngredient", b =>
                 {
-                    b.Property<Guid>("IngredientId")
-                        .HasColumnType("TEXT");
-
                     b.Property<Guid>("RecipeId")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(1);
+
+                    b.Property<Guid>("IngredientId")
+                        .HasColumnType("TEXT")
+                        .HasColumnOrder(2);
+
+                    b.Property<decimal>("IngredientQuantity")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Quantity")
-                        .HasColumnType("INTEGER");
+                    b.HasKey("RecipeId", "IngredientId");
 
-                    b.HasKey("IngredientId", "RecipeId");
+                    b.HasIndex("IngredientId");
 
-                    b.HasIndex("RecipeId");
-
-                    b.ToTable("recipeingredients");
+                    b.ToTable("RecipeIngredients");
                 });
 
             modelBuilder.Entity("ApiReceitas.Domain.Models.RecipeIngredient", b =>
                 {
                     b.HasOne("ApiReceitas.Domain.Models.Ingredient", "Ingredient")
-                        .WithMany("RecipeIngredients")
+                        .WithMany()
                         .HasForeignKey("IngredientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -87,11 +89,6 @@ namespace ApiReceitas.Migrations
                     b.Navigation("Ingredient");
 
                     b.Navigation("Recipe");
-                });
-
-            modelBuilder.Entity("ApiReceitas.Domain.Models.Ingredient", b =>
-                {
-                    b.Navigation("RecipeIngredients");
                 });
 
             modelBuilder.Entity("ApiReceitas.Domain.Models.Recipe", b =>

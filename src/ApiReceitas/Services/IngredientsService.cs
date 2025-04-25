@@ -36,7 +36,7 @@ namespace ApiReceitas.Services
             var existingIngredient = _dbContext.Ingredients.FirstOrDefault(i => i.IngredientId == ingredient.IngredientId);
             if (existingIngredient != null)
             {
-                existingIngredient.Nome = ingredient.Nome;
+                existingIngredient.Name = ingredient.Name;
                 existingIngredient.Unit = ingredient.Unit;
                 await _dbContext.SaveChangesAsync();
             }
