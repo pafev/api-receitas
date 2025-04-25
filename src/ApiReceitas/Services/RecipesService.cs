@@ -27,6 +27,7 @@ namespace ApiReceitas.Services
         public async Task AddRecipeAsync(Recipe recipe)
         {
             _dbContext.Add(recipe);
+            await _dbContext.SaveChangesAsync();
             await Task.CompletedTask;
         }
 
@@ -37,6 +38,7 @@ namespace ApiReceitas.Services
             {
                 existingRecipe.Method = recipe.Method;
                 existingRecipe.Ingredients = recipe.Ingredients;
+                await _dbContext.SaveChangesAsync();
             }
             await Task.CompletedTask;
         }
@@ -46,7 +48,8 @@ namespace ApiReceitas.Services
             var recipe = _dbContext.Recipes.FirstOrDefault(r => r.RecipeId == id);
             if (recipe != null)
             {
-                _dbContext.Remove(recipe);
+                _dbContext.Recipes.Remove(recipe);
+                await _dbContext.SaveChangesAsync();
             }
             await Task.CompletedTask;
         }
