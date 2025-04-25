@@ -1,46 +1,54 @@
 using ApiReceitas.Domain.Models;
+using ApiReceitas.Persistence;
 
 namespace ApiReceitas.Services
 {
     public class IngredientsService : IIngredientsService
-{
-    private readonly List<Ingredient> _ingredients = new List<Ingredient>();
-
-    public async Task<IEnumerable<Ingredient>> GetAllIngredientsAsync()
     {
-        return await Task.FromResult(_ingredients);
-    }
+        private readonly SqLiteDbContext _dbContext;
 
-    public async Task<Ingredient?> GetIngredientByIdAsync(Guid id)
-    {
-        return await Task.FromResult(_ingredients.FirstOrDefault(i => i.IngredientId == id));
-    }
-
-    public async Task AddIngredientAsync(Ingredient ingredient)
-    {
-        _ingredients.Add(ingredient);
-        await Task.CompletedTask;
-    }
-
-    public async Task UpdateIngredientAsync(Ingredient ingredient)
-    {
-        var existingIngredient = _ingredients.FirstOrDefault(i => i.IngredientId == ingredient.IngredientId);
-        if (existingIngredient != null)
+        public IngredientsService(SqLiteDbContext dbContext)
         {
-            existingIngredient.Nome = ingredient.Nome;
-            existingIngredient.Unit = ingredient.Unit;
+            _dbContext = dbContext;
         }
-        await Task.CompletedTask;
-    }
 
-    public async Task DeleteIngredientAsync(Guid id)
-    {
-        var ingredient = _ingredients.FirstOrDefault(i => i.IngredientId == id);
-        if (ingredient != null)
+        public async Task<IEnumerable<Ingredient>> GetAllIngredientsAsync()
         {
-            _ingredients.Remove(ingredient);
+            var ingredients = _dbContext.Ingredients.ToList();
+            return await Task.FromResult(ingredients);
         }
-        await Task.CompletedTask;
+
+        public async Task<Ingredient> GetIngredientByIdAsync(Guid id)
+        {
+            var ingredient = _dbContext.Ingredients.FirstOrDefault(i => i.IngredientId == id);
+            return await Task.FromResult(ingredient);
+        }
+
+        public async Task AddIngredientAsync(Ingredient ingredient)
+        {
+            _dbContext.Ingredients.Add(ingredient);
+            await Task.CompletedTask;
+        }
+
+        public async Task UpdateIngredientAsync(Ingredient ingredient)
+        {
+            var existingIngredient = _dbContext.Ingredients.FirstOrDefault(i => i.IngredientId == ingredient.IngredientId);
+            if (existingIngredient != null)
+            {
+                existingIngredient.Nome = ingredient.Nome;
+                existingIngredient.Unit = ingredient.Unit;
+            }
+            await Task.CompletedTask;
+        }
+
+        public async Task DeleteIngredientAsync(Guid id)
+        {
+            var ingredient = _dbContext.Ingredients.FirstOrDefault(i => i.IngredientId == id);
+            if (ingredient != null)
+            {
+                _dbContext.Remove(ingredient);
+            }
+            await Task.CompletedTask;
+        }
     }
-}
 }
