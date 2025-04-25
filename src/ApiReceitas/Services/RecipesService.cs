@@ -38,6 +38,7 @@ namespace ApiReceitas.Services
             {
                 existingRecipe.Method = recipe.Method;
                 existingRecipe.Ingredients = recipe.Ingredients;
+                existingRecipe.RecipeIngredients = recipe.RecipeIngredients;
                 await _dbContext.SaveChangesAsync();
             }
             await Task.CompletedTask;
