@@ -1,46 +1,54 @@
 using ApiReceitas.Domain.Models;
+using ApiReceitas.Persistence;
 
 namespace ApiReceitas.Services
 {
     public class RecipesService : IRecipesService
-{
-    private readonly List<Recipe> _recipes = new List<Recipe>();
-
-    public async Task<IEnumerable<Recipe>> GetAllRecipesAsync()
     {
-        return await Task.FromResult(_recipes);
-    }
+        private readonly SqLiteDbContext _dbContext;
 
-    public async Task<Recipe?> GetRecipeByIdAsync(Guid id)
-    {
-        return await Task.FromResult(_recipes.FirstOrDefault(r => r.RecipeId == id));
-    }
-
-    public async Task AddRecipeAsync(Recipe recipe)
-    {
-        _recipes.Add(recipe);
-        await Task.CompletedTask;
-    }
-
-    public async Task UpdateRecipeAsync(Recipe recipe)
-    {
-        var existingRecipe = _recipes.FirstOrDefault(r => r.RecipeId == recipe.RecipeId);
-        if (existingRecipe != null)
+        public RecipesService(SqLiteDbContext dbContext)
         {
-            existingRecipe.Method = recipe.Method;
-            existingRecipe.Ingredients = recipe.Ingredients;
+            _dbContext = dbContext;
         }
-        await Task.CompletedTask;
-    }
 
-    public async Task DeleteRecipeAsync(Guid id)
-    {
-        var recipe = _recipes.FirstOrDefault(r => r.RecipeId == id);
-        if (recipe != null)
+        public async Task<IEnumerable<Recipe>> GetAllRecipesAsync()
         {
-            _recipes.Remove(recipe);
+            var recipes = _dbContext.Recipes.ToList();
+            return await Task.FromResult(recipes);
         }
-        await Task.CompletedTask;
+
+        public async Task<Recipe> GetRecipeByIdAsync(Guid id)
+        {
+            var recipe = _dbContext.Recipes.FirstOrDefault(r => r.RecipeId == id);
+            return await Task.FromResult(recipe);
+        }
+
+        public async Task AddRecipeAsync(Recipe recipe)
+        {
+            _dbContext.Add(recipe);
+            await Task.CompletedTask;
+        }
+
+        public async Task UpdateRecipeAsync(Recipe recipe)
+        {
+            var existingRecipe = _dbContext.Recipes.FirstOrDefault(r => r.RecipeId == recipe.RecipeId);
+            if (existingRecipe != null)
+            {
+                existingRecipe.Method = recipe.Method;
+                existingRecipe.Ingredients = recipe.Ingredients;
+            }
+            await Task.CompletedTask;
+        }
+
+        public async Task DeleteRecipeAsync(Guid id)
+        {
+            var recipe = _dbContext.Recipes.FirstOrDefault(r => r.RecipeId == id);
+            if (recipe != null)
+            {
+                _dbContext.Remove(recipe);
+            }
+            await Task.CompletedTask;
+        }
     }
-}
 }
